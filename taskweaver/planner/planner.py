@@ -75,7 +75,8 @@ class Planner(Role):
         self.llm_api = llm_api
 
         self.workers = workers
-        self.recipient_alias_set = set([alias for alias, _ in self.workers.items()])
+        # self.recipient_alias_set = set([alias for alias, _ in self.workers.items()])
+        self.recipient_alias_set = {"QueryData", "DataAnalysis"}
 
         self.planner_post_translator = post_translator
 
@@ -259,8 +260,8 @@ class Planner(Role):
                 missing_elements.append("message")
 
             attachment_types = [attachment.type for attachment in post.attachment_list]
-            if AttachmentType.init_plan not in attachment_types:
-                missing_elements.append("init_plan")
+            # if AttachmentType.init_plan not in attachment_types:
+            #     missing_elements.append("init_plan")
             if AttachmentType.plan not in attachment_types:
                 missing_elements.append("plan")
             if AttachmentType.current_plan_step not in attachment_types:

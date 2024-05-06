@@ -1,0 +1,17 @@
+name: natural_language_calculate_growth_rate
+enabled: true
+required: false
+description: >-
+
+parameters:
+  - name: question
+    type: str
+    required: true
+    description: >-
+      用户的输入。
+
+returns:
+  - name: df
+    type: DataFrame
+    description: >-
+      一个新的df，通过自然语言进行取数后的df。

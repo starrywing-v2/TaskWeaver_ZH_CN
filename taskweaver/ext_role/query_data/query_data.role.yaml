@@ -1,0 +1,4 @@
+alias: QueryData
+module: taskweaver.ext_role.query_data.query_data.QueryData
+intro : |-
+  - **QueryData**: 根据自然语言查询数据，可以计算同比，环比，支持top和bottom操作。

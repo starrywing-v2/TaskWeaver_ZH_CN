@@ -167,7 +167,7 @@ class PostTranslator:
             structured_llm.append({"type": "send_to", "content": post.send_to})
         if if_format_message:
             structured_llm.append({"type": "message", "content": post.message})
-        structured_llm_text = json.dumps({"response": structured_llm})
+        structured_llm_text = json.dumps({"response": structured_llm}, ensure_ascii=False)
         return structured_llm_text
 
     def parse_llm_output(self, llm_output: str) -> List[Dict[str, str]]:

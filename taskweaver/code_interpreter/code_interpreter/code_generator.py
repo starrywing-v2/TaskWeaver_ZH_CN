@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from typing import List, Optional
 
 from injector import inject
@@ -17,7 +18,7 @@ from taskweaver.module.event_emitter import PostEventProxy, SessionEventEmitter
 from taskweaver.module.tracing import Tracing, tracing_decorator
 from taskweaver.role import PostTranslator, Role
 from taskweaver.role.role import RoleConfig
-from taskweaver.utils import read_yaml
+from taskweaver.utils import read_yaml, create_id
 
 
 class CodeGeneratorConfig(RoleConfig):
@@ -57,6 +58,16 @@ class CodeGeneratorConfig(RoleConfig):
         self.use_experience = self._get_bool("use_experience", False)
 
         self.llm_alias = self._get_str("llm_alias", default="", required=False)
+
+
+def parse_code(text: str, lang: str = "") -> str:
+    pattern = rf"```{lang}.*?\s+(.*?)```"
+    match = re.search(pattern, text, re.DOTALL)
+    if match:
+        code = match.group(1)
+    else:
+        raise Exception
+    return code
 
 
 class CodeGenerator(Role):
@@ -334,6 +345,7 @@ class CodeGenerator(Role):
         memory: Memory,
         post_proxy: Optional[PostEventProxy] = None,
         prompt_log_path: Optional[str] = None,
+        chat_history: List[dict] = None
     ) -> Post:
         assert post_proxy is not None, "Post proxy is not provided."
 
@@ -358,9 +370,9 @@ class CodeGenerator(Role):
         else:
             selected_experiences = None
 
-        prompt = self.compose_prompt(rounds, self.plugin_pool, selected_experiences)
-        self.tracing.set_span_attribute("prompt", json.dumps(prompt, indent=2))
-        prompt_size = self.tracing.count_tokens(json.dumps(prompt))
+        # prompt = self.compose_prompt(rounds, self.plugin_pool, selected_experiences)
+        self.tracing.set_span_attribute("prompt", json.dumps(chat_history, indent=2))
+        prompt_size = self.tracing.count_tokens(json.dumps(chat_history, ensure_ascii=False))
         self.tracing.set_span_attribute("prompt_size", prompt_size)
         self.tracing.add_prompt_size(
             size=prompt_size,
@@ -375,17 +387,25 @@ class CodeGenerator(Role):
             else:
                 return False
 
-        self.post_translator.raw_text_to_post(
-            llm_output=self.llm_api.chat_completion_stream(
-                prompt,
-                use_smoother=True,
-                llm_alias=self.config.llm_alias,
-            ),
-            post_proxy=post_proxy,
-            early_stop=early_stop,
+        # self.post_translator.raw_text_to_post(
+        #     llm_output=self.llm_api.chat_completion_stream(
+        #         chat_history,
+        #         use_smoother=True,
+        #         llm_alias=self.config.llm_alias,
+        #     ),
+        #     post_proxy=post_proxy,
+        #     early_stop=early_stop,
+        # )
+        llm_output = self.llm_api.chat_completion_stream(
+            chat_history,
+            use_smoother=True,
+            llm_alias=self.config.llm_alias,
         )
-
-        post_proxy.update_send_to("Planner")
+        llm_output_list = [token["content"] for token in llm_output]  # collect all the llm output via iterator
+        llm_output = "".join(llm_output_list)
+        python_code = parse_code(llm_output, lang="python")
+        self.logger.info(f"LLM output: {python_code}")
+        post_proxy.post.attachment_list = [Attachment(content=python_code, type=AttachmentType.python, id="atta-" + create_id())]
         generated_code = ""
         for attachment in post_proxy.post.attachment_list:
             if attachment.type in [AttachmentType.sample, AttachmentType.text]:
@@ -400,7 +420,7 @@ class CodeGenerator(Role):
             self.selected_plugin_pool.filter_unused_plugins(code=generated_code)
 
         if prompt_log_path is not None:
-            self.logger.dump_log_file(prompt, prompt_log_path)
+            self.logger.dump_log_file(chat_history, prompt_log_path)
 
         self.tracing.set_span_attribute("code", generated_code)
 
