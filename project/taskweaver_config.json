@@ -1,5 +1,7 @@
 {
-  "llm.api_base": "https://api.openai.com/v1",
-  "llm.api_key": "",
-  "llm.model": "gpt-4-1106-preview"
+  "llm.api_base": "https://api.gptsapi.net/v1",
+  "llm.api_key": "sk-DRe41d547337d3d1abb9ee07a9fca9538491f5721a2ezJav",
+  "llm.model": "gpt-3.5-turbo-1106",
+  "execution_service.kernel_mode": "local",
+  "session.roles": ["planner", "query_data"]
 }

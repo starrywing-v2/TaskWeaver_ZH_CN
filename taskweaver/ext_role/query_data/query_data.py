@@ -1,13 +1,7 @@
 import os
-from typing import Dict, Literal, Optional, List
+from typing import Dict, Optional, List
 
 from injector import inject
-from taskweaver.code_interpreter.code_interpreter.code_interpreter import (
-    update_verification,
-    update_execution,
-)
-
-from taskweaver.code_interpreter.code_interpreter.code_generator import format_code_feedback
 
 from taskweaver.code_interpreter.code_executor import CodeExecutor
 from taskweaver.code_interpreter.code_interpreter import (
@@ -15,18 +9,23 @@ from taskweaver.code_interpreter.code_interpreter import (
     format_code_revision_message,
     format_output_revision_message,
 )
+from taskweaver.code_interpreter.code_interpreter.code_generator import format_code_feedback
+from taskweaver.code_interpreter.code_interpreter.code_interpreter import (
+    update_verification,
+    update_execution,
+)
 from taskweaver.code_interpreter.code_verification import code_snippet_verification, format_code_correction_message
 from taskweaver.code_interpreter.interpreter import Interpreter
+from taskweaver.llm.util import ChatMessageType, format_chat_message
 from taskweaver.logging import TelemetryLogger
 from taskweaver.memory import Memory, Post, Round
 from taskweaver.memory.attachment import AttachmentType, Attachment
-from taskweaver.memory.experience import Experience, ExperienceGenerator
-from taskweaver.memory.plugin import PluginEntry, PluginRegistry
-from taskweaver.module.event_emitter import PostEventProxy, SessionEventEmitter
+from taskweaver.memory.experience import Experience
+from taskweaver.memory.plugin import PluginEntry
+from taskweaver.module.event_emitter import SessionEventEmitter
 from taskweaver.module.tracing import Tracing, get_tracer, tracing_decorator
 from taskweaver.role import Role
 from taskweaver.role.role import RoleConfig, RoleEntry
-from taskweaver.llm.util import ChatMessageType, format_chat_message
 from taskweaver.utils import read_yaml
 
 

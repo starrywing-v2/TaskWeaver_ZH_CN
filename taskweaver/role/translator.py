@@ -73,6 +73,7 @@ class PostTranslator:
                 )
                 self.logger.info(f"LLM output: {full_llm_content}")
 
+        # raw_text_to_post
         value_buf: str = ""
         filtered_stream = stream_filter(llm_output)
         parser_stream = (

@@ -88,10 +88,6 @@ def parse_dataframe_from_cellset(cell_set: dict):
 
 
 def query_cell_set_by_mdx(url: str, smartbi_cookies: str, model_id: str, query_mdx: str):
-    # print("input mdx:")
-    # print("#" * 150 + "\n")
-    # print(query_mdx)
-    # print("\n"+"#" * 150)
     data = query_mdx.encode(encoding="utf-8")
     headers = {
         'Content-Type': 'text/plain; charset=UTF-8',
@@ -114,3 +110,4 @@ def query_dataframe_from_mdx(url: str, user_name: str, password: str, model_id: 
     result_cellset = query_cell_set_by_mdx(url, cookie, model_id, query_mdx)
     result = parse_dataframe_from_cellset(result_cellset)
     return result
+

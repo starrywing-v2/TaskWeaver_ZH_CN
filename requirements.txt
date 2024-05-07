@@ -27,3 +27,16 @@ colorama>=0.4.6
 
 
 
+
+langchain~=0.1.17
+jupyter_client~=8.6.0
+tiktoken~=0.6.0
+setuptools~=68.2.2
+yaml~=0.2.5
+packaging~=23.2
+chainlit~=1.0.504
+pydantic~=2.6.0
+cycler~=0.12.1
+traitlets~=5.14.1
+ipython~=8.20.0
+pillow~=10.2.0
